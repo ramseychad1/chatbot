@@ -12,12 +12,25 @@ st.write(
 # Ask user for their OpenAI API key via `st.text_input`.
 # Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
 # via `st.secrets`, see https://docs.streamlit.io/develop/concepts/connections/secrets-management
-openai_api_key = st.text_input("OpenAI API Key", type="password")
+# openai_api_key = st.text_input("OpenAI API Key", type="password")
+# if not openai_api_key:
+#    st.info("Please add your OpenAI API key to continue.", icon="🗝️")
+#else:
+import os
+import streamlit as st
+from openai import OpenAI
+
+# Prefer Streamlit secrets, then environment variable, then UI input.
+openai_api_key = (
+    st.secrets.get("OPENAI_API_KEY")
+    if hasattr(st, "secrets")
+    else None
+) or os.getenv("OPENAI_API_KEY") or st.text_input("OpenAI API Key", type="password")
+
 if not openai_api_key:
     st.info("Please add your OpenAI API key to continue.", icon="🗝️")
+    st.stop()  # stop execution until key is provided
 else:
-
-    # Create an OpenAI client.
     client = OpenAI(api_key=openai_api_key)
 
     # Create a session state variable to store the chat messages. This ensures that the
@@ -41,7 +54,7 @@ else:
 
         # Generate a response using the OpenAI API.
         stream = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="asst_AkO3bonQ57rgIG0y9ajDWAZN",
             messages=[
                 {"role": m["role"], "content": m["content"]}
                 for m in st.session_state.messages
